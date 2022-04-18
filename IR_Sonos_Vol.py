@@ -1,3 +1,8 @@
+# controller pinout header (RPi 3B) - wire color - ir reciever (TSOP38238)
+# 3v3 (pin 01 or 17) - red wire - Vs  (pin 3)
+# gnd (pin 06 or 09) - blk wire - Gnd (pin 2)
+# dio (pin 12 or 11) - yel wire - Out (pin 1)
+
 from RPi import GPIO
 import RPi.GPIO as GPIO
 from time import time
