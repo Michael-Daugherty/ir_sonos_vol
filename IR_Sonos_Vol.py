@@ -7,7 +7,11 @@ from RPi import GPIO
 import RPi.GPIO as GPIO
 from time import time
 import os
-from soco_cli import api  # https://github.com/avantrec/soco-cli  # sudo pip install -U soco-cli
+
+# Command Line Interface to Control Sonos Sound Systems
+# sudo wget https://github.com/avantrec/soco-cli
+# sudo pip install -U soco-cli
+from soco_cli import api
 
 IR_PIN=12
 SPKR="MySonos"
