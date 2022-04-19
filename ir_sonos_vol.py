@@ -3,15 +3,15 @@
 # gnd (pin 06 or 09) - blk wire - Gnd (pin 2)
 # dio (pin 12 or 11) - yel wire - Out (pin 1)
 
+# Command Line Interface to Control Sonos Sound Systems
+# sudo wget https://github.com/avantrec/soco-cli
+# sudo pip install -U soco-cli
+from soco_cli import api 
+
 from RPi import GPIO
 import RPi.GPIO as GPIO
 from time import time
 import os
-
-# Command Line Interface to Control Sonos Sound Systems
-# sudo wget https://github.com/avantrec/soco-cli
-# sudo pip install -U soco-cli
-from soco_cli import api
 
 IR_PIN=12
 SPKR="MySonos"
