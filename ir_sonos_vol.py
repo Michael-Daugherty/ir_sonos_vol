@@ -14,20 +14,13 @@ from soco_cli import api
 # Vcc (Pin.2) mid - red - Pin.06 (Gnd)
 # sCL (Pin.3) mid - grn - Pin.05 (gpIO.03)
 # sDA (Pin.4) rht - blu - Pin.03 (gpIO.02)
-#
 # Determin display address: sudo -H pip3 install --upgrade luma.oled
-#
 from luma.core.interface.serial import i2c, spi, pcf8574
 from luma.core.interface.parallel import bitbang_6800
 from luma.core.render import canvas
 from luma.oled.device import ssd1306, ssd1309, ssd1325, ssd1331, sh1106, ws0010
-# rev.1 users set port=0
-# substitute spi(device=0, port=0) below if using that interface
-# substitute bitbang_6800(RS=7, E=8, PINS=[25,24,23,27]) below if using that interface
 serial = i2c(port=1, address=0x3C)
-# substitute ssd1331(...) or sh1106(...) below if using that device
 device = ssd1306(serial)
-
 
 from RPi import GPIO
 import RPi.GPIO as GPIO
@@ -38,16 +31,16 @@ import os
 # Out (pin.1 lft) - blu wire - Pin.11 (gpIO.17)
 # Gnd (pin.2 mid) - blk wire - Pin.09 (Gnd)
 # V.s (pin.3 rht) - red wire - Pin.17 (3v3)
-IR_PIN=11
+ir_pin=11
 
-SPKR="MySonos"
-UP=3772833823 # UP 0xe0e0e01f 0b11100000111000001110000000011111
-DN=3772829743 # DN 0xe0e0d02f 0b11100000111000001101000000101111
-MU=3772837903 # MU 0xe0e0f00f 0b11100000111000001111000000001111
+spkr="MySonos"
+up=3772833823 # UP 0xe0e0e01f 0b11100000111000001110000000011111
+dn=3772829743 # DN 0xe0e0d02f 0b11100000111000001101000000101111
+mu=3772837903 # MU 0xe0e0f00f 0b11100000111000001111000000001111
 
 def setup():
     GPIO.setmode(GPIO.BOARD)  # Numbers GPIOs by physical location
-    GPIO.setup(IR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(ir_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 def binary_aquire(pin, duration):
     # aquires data as quickly as possible
@@ -92,52 +85,56 @@ def destroy():
 
 if __name__ == "__main__":
     setup()
+    title = " IR_Sonos_Vol - Last IR: "
+    spin = ["\\","|","/","-"]
+    ln1=+spin[0] + title
+    ln2=""
+    with canvas(device) as draw:
+        draw.text((0, 0), ln1, fill="white")
     try:
         MUTE="a"
         i=0
-        TITLE = " IR_Sonos_Vol"
-        SPINNER = ["\\","|","/","-"]
-        print(TITLE, "    ", SPINNER[0], end="\r")
+        print(title, "    ", spin[0], end="\r")
         while True:
             if i<3:
                 i+=1
             else:
                 i=0
-            GPIO.wait_for_edge(IR_PIN, GPIO.FALLING, timeout=500)
-            code = on_ir_receive(IR_PIN)
-            if code==UP:
-                exit_code, output, error = api.run_command(SPKR, "mute", "off")
-                exit_code, output, error = api.run_command(SPKR, "rel_vol", "+4")
-                exit_code, output, error = api.run_command(SPKR, "volume")
-                print(TITLE, output, "  ", SPINNER[i], end="  \r")
+            GPIO.wait_for_edge(ir_pin, GPIO.FALLING, timeout=500)
+            code = on_ir_receive(ir_pin)
+            if code==up:
+                exit_code, output, error = api.run_command(spkr, "mute", "off")
+                exit_code, output, error = api.run_command(spkr, "rel_vol", "+4")
+                exit_code, output, error = api.run_command(spkr, "volume")
+                print(title, output, "  ", spin[i], end="  \r")
                 with canvas(device) as draw:
                     draw.text((30, 40), output, fill="white")
 
-            elif code==DN:
-                exit_code, output, error = api.run_command(SPKR, "rel_vol", "-12")
-                exit_code, output, error = api.run_command(SPKR, "volume")
-                print(TITLE, output, "  ", SPINNER[i], end="  \r")
-            elif code==MU:
+            elif code==dn:
+                exit_code, output, error = api.run_command(spkr, "rel_vol", "-12")
+                exit_code, output, error = api.run_command(spkr, "volume")
+                print(title, output, "  ", spin[i], end="  \r")
+            elif code==mu:
                 # Ensure speaker is playing the AUX source
-                exit_code, output, error = api.run_command(SPKR, "line_in")
+                exit_code, output, error = api.run_command(spkr, "line_in")
                 if output=="off":
-                    exit_code, output, error = api.run_command(SPKR, "line_in", "on")
+                    exit_code, output, error = api.run_command(spkr, "line_in", "on")
                 
-                exit_code, output, error = api.run_command(SPKR, "mute")
+                exit_code, output, error = api.run_command(spkr, "mute")
                 if output=="off":
-                    exit_code, output, error = api.run_command(SPKR, "mute", "on")
-                    print(TITLE, "Mute", SPINNER[i], end="  \r")
+                    exit_code, output, error = api.run_command(spkr, "mute", "on")
+                    print(title, "Mute", spin[i], end="  \r")
                 elif output=="on":
-                    exit_code, output, error = api.run_command(SPKR, "mute", "off")
-                    exit_code, output, error = api.run_command(SPKR, "volume")
-                    print(TITLE, output, "  ", SPINNER[i], end="  \r")
+                    exit_code, output, error = api.run_command(spkr, "mute", "off")
+                    exit_code, output, error = api.run_command(spkr, "volume")
+                    print(title, output, "  ", spin[i], end="  \r")
             else:
-                exit_code, output, error = api.run_command(SPKR, "mute")
+                exit_code, output, error = api.run_command(spkr, "mute")
                 if output=="on":
-                    print(TITLE, "Mute", SPINNER[i], end="  \r")
+                    print(title, "Mute", spin[i], end="  \r")
                 elif output=="off":    
-                    exit_code, output, error = api.run_command(SPKR, "volume")
-                    print(TITLE, output, "  ", SPINNER[i], end="  \r")
+                    exit_code, output, error = api.run_command(spkr, "volume")
+                    print(title, output, "  ", spin[i], end="  \r")
     except KeyboardInterrupt:
-        print("\r", TITLE, " exited ", sep="")
+        print("\r", title, " exited ", sep="")
 destroy()
