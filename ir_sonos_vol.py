@@ -1,8 +1,3 @@
-# controller pinout header (RPi 3B) - wire color - ir reciever (TSOP38238)
-# 3v3 (pin 01 or 17) - red wire - Vs  (pin 3)
-# gnd (pin 06 or 09) - blk wire - Gnd (pin 2)
-# dio (pin 12 or 11) - yel wire - Out (pin 1)
-
 # Command Line Interface to Control Sonos Sound Systems
 # sudo wget https://github.com/avantrec/soco-cli
 # sudo pip install -U soco-cli
@@ -13,7 +8,12 @@ import RPi.GPIO as GPIO
 from time import time
 import os
 
-IR_PIN=12
+# ir reciever (TSOP38238) - wire color - controller header (RPi 3 B+)
+# Out (pin 1 lft) - yel wire -  Pin11 (GPIO17)
+# Gnd (pin 2 mid) - blk wire -  Pin09 (GND)
+# V.s (pin 3 rht) - red wire -  Pin17 (3V3)
+IR_PIN=11
+
 SPKR="MySonos"
 UP=3772833823 # UP 0xe0e0e01f 0b11100000111000001110000000011111
 DN=3772829743 # DN 0xe0e0d02f 0b11100000111000001101000000101111
