@@ -4,12 +4,29 @@
 from soco_cli import api 
 
 # https://luma-oled.readthedocs.io/en/latest/
-# Display (SSD1306) - wire color - controller header (RPi 3 B+)
+# Enable i2c
+#   sudo rasp-config > Interfaceing Options > i2c > yes
+# Add User to i2c
+#   sudo usermod -a -G i2c pi
+#
+# Display (SSD1306) - wire color - SBC header (RPi 3 B+)
 # Gnd (Pin.1) lft - bkl - Pin.01 (3V3)
 # Vcc (Pin.2) mid - red - Pin.06 (Gnd)
 # sCL (Pin.3) mid - grn - Pin.05 (gpIO.03)
 # sDA (Pin.4) rht - blu - Pin.03 (gpIO.02)
-
+#
+# Determin display address: sudo -H pip3 install --upgrade luma.oled
+#
+from luma.core.interface.serial import i2c, spi, pcf8574
+from luma.core.interface.parallel import bitbang_6800
+from luma.core.render import canvas
+from luma.oled.device import ssd1306, ssd1309, ssd1325, ssd1331, sh1106, ws0010
+# rev.1 users set port=0
+# substitute spi(device=0, port=0) below if using that interface
+# substitute bitbang_6800(RS=7, E=8, PINS=[25,24,23,27]) below if using that interface
+serial = i2c(port=1, address=0x3C)
+# substitute ssd1331(...) or sh1106(...) below if using that device
+device = ssd1306(serial)
 
 
 from RPi import GPIO
@@ -17,7 +34,7 @@ import RPi.GPIO as GPIO
 from time import time
 import os
 
-# ir reciever (TSOP38238) - wire color - controller header (RPi 3 B+)
+# ir reciever (TSOP38238) - wire color - SBC header (RPi 3 B+)
 # Out (pin.1 lft) - blu wire - Pin.11 (gpIO.17)
 # Gnd (pin.2 mid) - blk wire - Pin.09 (Gnd)
 # V.s (pin.3 rht) - red wire - Pin.17 (3v3)
@@ -93,6 +110,9 @@ if __name__ == "__main__":
                 exit_code, output, error = api.run_command(SPKR, "rel_vol", "+4")
                 exit_code, output, error = api.run_command(SPKR, "volume")
                 print(TITLE, output, "  ", SPINNER[i], end="  \r")
+                with canvas(device) as draw:
+                    draw.text((30, 40), output, fill="white")
+
             elif code==DN:
                 exit_code, output, error = api.run_command(SPKR, "rel_vol", "-12")
                 exit_code, output, error = api.run_command(SPKR, "volume")
