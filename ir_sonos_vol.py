@@ -3,15 +3,24 @@
 # sudo pip install -U soco-cli
 from soco_cli import api 
 
+# https://luma-oled.readthedocs.io/en/latest/
+# Display (SSD1306) - wire color - controller header (RPi 3 B+)
+# Gnd (Pin.1) lft - bkl - Pin.01 (3V3)
+# Vcc (Pin.2) mid - red - Pin.06 (Gnd)
+# sCL (Pin.3) mid - grn - Pin.05 (gpIO.03)
+# sDA (Pin.4) rht - blu - Pin.03 (gpIO.02)
+
+
+
 from RPi import GPIO
 import RPi.GPIO as GPIO
 from time import time
 import os
 
 # ir reciever (TSOP38238) - wire color - controller header (RPi 3 B+)
-# Out (pin 1 lft) - yel wire -  Pin11 (GPIO17)
-# Gnd (pin 2 mid) - blk wire -  Pin09 (GND)
-# V.s (pin 3 rht) - red wire -  Pin17 (3V3)
+# Out (pin.1 lft) - blu wire - Pin.11 (gpIO.17)
+# Gnd (pin.2 mid) - blk wire - Pin.09 (Gnd)
+# V.s (pin.3 rht) - red wire - Pin.17 (3v3)
 IR_PIN=11
 
 SPKR="MySonos"
