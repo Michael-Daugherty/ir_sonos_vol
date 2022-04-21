@@ -9,7 +9,7 @@ from soco_cli import api
 # Add User to i2c
 #   sudo usermod -a -G i2c pi
 #
-# Display (SSD1306) - wire color - SBC header (RPi 3 B+)
+# Display 128x64 (SSD1306) - wire color - SBC header (RPi 3 B+)
 # Gnd (Pin.1) lft - bkl - Pin.01 (3V3)
 # Vcc (Pin.2) mid - red - Pin.06 (Gnd)
 # sCL (Pin.3) mid - grn - Pin.05 (gpIO.03)
@@ -85,10 +85,10 @@ def destroy():
 
 if __name__ == "__main__":
     setup()
-    title = " IR_Sonos_Vol - Last IR: "
+    title = "IR_Sonos_Vol "
     spin = ["\\","|","/","-"]
-    ln1=+spin[0] + title
-    ln2=""
+    ln1 = title + spin[0]
+    ln2 = ""
     with canvas(device) as draw:
         draw.text((0, 0), ln1, fill="white")
     try:
